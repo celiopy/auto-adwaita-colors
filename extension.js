@@ -119,7 +119,7 @@ export default class AccentColorExtension extends Extension {
             let iconTheme = color === 'blue' ? 'Adwaita' : `Adwaita-${color}`;
 
             const possiblePaths = [
-                '/var/usrlocal/share/icons',
+                '/usr/local/share/icons',
                 '/usr/share/icons',
                 GLib.get_home_dir() + '/.local/share/icons'
             ];
