@@ -89,7 +89,7 @@ async function downloadZip(url, destPath) {
 // A single function that returns all relevant information for a theme
 function getVariant(variant = 'Adwaita-blue') {
     const possiblePaths = [
-        '/var/usrlocal/share/icons',
+        '/usr/local/share/icons',
         '/usr/share/icons',
         GLib.get_home_dir() + '/.local/share/icons'
     ];
