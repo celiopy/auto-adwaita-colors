@@ -1,4 +1,5 @@
 import Gio from 'gi://Gio';
+import GLib from 'gi://GLib';
 
 Gio._promisify(Gio.Subprocess.prototype, 'communicate_utf8_async');
 
@@ -85,4 +86,35 @@ async function downloadZip(url, destPath) {
     });
 }
 
-export { fetchLatestVersion, downloadZip };
+// A single function that returns all relevant information for a theme
+function getVariant(variant = 'Adwaita-blue') {
+    const possiblePaths = [
+        '/var/usrlocal/share/icons',
+        '/usr/share/icons',
+        GLib.get_home_dir() + '/.local/share/icons'
+    ];
+
+    for (const path of possiblePaths) {
+        const iconThemePath = GLib.build_filenamev([path, variant]);
+        if (GLib.file_test(iconThemePath, GLib.FileTest.EXISTS)) {
+            return {
+                found: true,
+                path: iconThemePath,
+                state: getInstallState(path)  // Either 'root' or 'user'
+            };
+        }
+    }
+
+    // If not found, return a default value indicating it doesn't exist
+    return { found: false, path: null, state: null };
+}
+
+// Function to get the install state (root or user)
+function getInstallState(path) {
+    if (path.startsWith('/var') || path.startsWith('/usr')) {
+        return 'root';
+    }
+    return 'user';
+}
+
+export { fetchLatestVersion, downloadZip, getVariant};

@@ -2,7 +2,7 @@ import Gtk from 'gi://Gtk';
 import Adw from 'gi://Adw';
 import GLib from 'gi://GLib';
 import { ExtensionPreferences, gettext as _ } from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
-import { fetchLatestVersion, downloadZip } from './utils.js'; // Adjust path as needed
+import { fetchLatestVersion, downloadZip, getVariant } from './utils.js'; // Adjust path as needed
 
 export default class AccentColorExtensionPrefs extends ExtensionPreferences {
     fillPreferencesWindow(window) {
@@ -79,6 +79,10 @@ export default class AccentColorExtensionPrefs extends ExtensionPreferences {
         });
 
         group.add(notificationRow);
+
+        const { found, state } = getVariant();
+        window._settings.set_boolean('notify-about-releases', state === 'user');
+        downloadButton.set_sensitive(state === 'user');
     }
 
     async handleDownload(window, versionLabel, progressBar) {
@@ -87,8 +91,7 @@ export default class AccentColorExtensionPrefs extends ExtensionPreferences {
         const tempZipFile = GLib.get_tmp_dir() + '/adwaita-colors.zip';
 
         // Use metadata.path to get the extension's directory dynamically
-        const extensionRoot = this.path;  // This points to the extension's root directory
-        const scriptPath = GLib.build_filenamev([extensionRoot, 'install_adwaita_colors.sh']);  // Construct the full path to the script
+        const scriptPath = GLib.build_filenamev([this.path, 'install_adwaita_colors.sh']);  // Construct the full path to the script
 
         try {
             // Show progress bar and initialize
@@ -133,11 +136,6 @@ export default class AccentColorExtensionPrefs extends ExtensionPreferences {
                             versionLabel.set_label(this.getCurrentVersionLabel(window));
                         }
                     });
-                    if (status === 0) {
-                    } else {
-                        // progressBar.set_text(_("Failed."));
-                        // logError(new Error("Shell script failed."), 'Download/Extraction failed');
-                    }
 
                     // Restore the original accent color after the process is finished
                     window._settings.set_string('accent-color', savedAccentColor);
@@ -167,21 +165,6 @@ export default class AccentColorExtensionPrefs extends ExtensionPreferences {
     getCurrentVersionLabel(window) {
         const currentVersion = window._settings.get_string('current-version') || 'NA';
         return `<b>Current Version:</b> ${currentVersion}`;
-    }
-
-    showErrorMessage(message) {
-        const dialog = new Gtk.MessageDialog({
-            modal: true,
-            message_type: Gtk.MessageType.ERROR,
-            buttons: Gtk.ButtonsType.OK,
-            text: message,
-        });
-        dialog.run();
-        dialog.destroy();
-    }
-
-    showSuccessMessage(message) {
-        console.log(message); // Replace with your UI message logic
     }
 }
 
