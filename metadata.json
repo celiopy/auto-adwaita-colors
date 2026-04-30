@@ -5,6 +5,6 @@
   "url": "https://www.github.com/celiopy/auto-adwaita-colors",
   "settings-schema": "org.gnome.shell.extensions.auto-adwaita-colors",
   "shell-version": [
-    "47", "48", "49"
+    "47", "48", "49","50"
   ]
 }
